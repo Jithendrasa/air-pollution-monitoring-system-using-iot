@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Air Quality Monitor</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Air Quality Monitor</h1>
+        <div class="sensor-readings">
+            <h2>Sensor Readings</h2>
+            <p>MQ135 PPM: <span id="mq135-ppm">-</span></p>
+            <p>MQ6 PPM: <span id="mq6-ppm">-</span></p>
+        </div>
+        <div class="prediction">
+            <h2>Prediction</h2>
+            <p>Air Quality: <span id="predicted-air-quality">-</span></p>
+        </div>
+    </div>
+
+    <script>
+        setInterval(function() {
+            fetch('/data')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('mq135-ppm').innerText = data.mq135_ppm;
+                    document.getElementById('mq6-ppm').innerText = data.mq6_ppm;
+                    document.getElementById('predicted-air-quality').innerText = data.predicted_air_quality;
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        }, 1000);
+    </script>
+</body>
+</html>
