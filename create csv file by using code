@@ -1,0 +1,30 @@
+import numpy as np
+import pandas as pd
+
+# Define the number of data points
+num_data_points = 1000
+
+# Generate synthetic sensor readings (random values)
+mq135_ppm = np.random.uniform(low=0, high=200, size=num_data_points)
+mq6_ppm = np.random.uniform(low=0, high=300, size=num_data_points)
+
+# Generate synthetic air quality labels based on sensor readings
+# You may adjust this logic based on your specific criteria
+air_quality = []
+for i in range(num_data_points):
+    if mq135_ppm[i] < 50 and mq6_ppm[i] < 100:
+        air_quality.append('Good')
+    elif mq135_ppm[i] < 100 and mq6_ppm[i] < 200:
+        air_quality.append('Moderate')
+    else:
+        air_quality.append('Poor')
+
+# Create a DataFrame to store the synthetic dataset
+data = pd.DataFrame({
+    'MQ135_PPM': mq135_ppm,
+    'MQ6_PPM': mq6_ppm,
+    'Air_Quality': air_quality
+})
+
+# Save the synthetic dataset to a CSV file
+data.to_csv('synthetic_dataset.csv', index=False)
