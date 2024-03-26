@@ -34,6 +34,27 @@ This Arduino project is designed to monitor air quality using MQ135 and MQ6 gas 
 4. If the readings exceed the predefined thresholds, an alarm will be triggered.
 5. Use the keypad to adjust the thresholds if necessary.
 
+## circuit diagram
+    +--------------------------------------+
+    |                                      |
+    |        MQ135 Sensor         MQ6 Sensor|
+    |        +-------------+     +---------+|
+    |        |             |     |         ||
+    |        |   Arduino   |-----|  Arduino||
+    |        |             |     |         ||
+    |        +------+------+     +---------+|
+    |               |             |         |
+    |               |             |         |
+    |               |             |         |
+    |        +------+-------------+---------+
+    |        |      | LED           Buzzer |
+    |        |      +-------------+---------+
+    |        |                    |         |
+    +--------+--------------------+---------+
+             |                    |
+            GND                  GND
+
+
 
 
 ## Contributors
