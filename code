@@ -1,0 +1,111 @@
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
+#include <MQ135.h>
+#include <MQ6.h>
+
+// Initialize LCD
+LiquidCrystal_I2C lcd(0x27, 16, 2);
+
+// Define pin connections
+#define MQ135_PIN A0
+#define MQ6_PIN A1
+#define #define FAN_PIN 9 // Example pin for controlling fan
+#define LED_PIN 13  // Example pin for alarm LED
+#define BUZZER_PIN 10  // Example pin for buzzer
+#define BUTTON_PIN 2 // Example pin for silence button
+
+// Define thresholds
+#define MQ135_THRESHOLD 100  // Example threshold for MQ135 sensor
+#define MQ6_THRESHOLD 200  // Example threshold for MQ6 sensor
+
+// Initialize sensors
+MQ135 mq135(MQ135_PIN);
+MQ6 mq6(MQ6_PIN);
+
+// Variables
+bool alarmSilenced = false;
+
+void setup() {
+  // Initialize LCD
+  lcd.begin();
+  lcd.backlight();
+
+  // Initialize serial communication for debugging
+  Serial.begin(9600);
+
+  // Set LED, buzzer, and button pins as output/input
+  pinMode(LED_PIN, OUTPUT);
+  pinMode(BUZZER_PIN, OUTPUT);
+  pinMode(BUTTON_PIN, INPUT_PULLUP);
+
+  // Set fan pin as output
+  pinMode(FAN_PIN, OUTPUT);
+
+  // Calibrate sensors
+  calibrateSensors();
+}
+
+void loop() {
+  // Read sensor data
+  float mq135_ppm = mq135.getPPM();
+  float mq6_ppm = mq6.getPPM();
+
+  // Display sensor data on LCD
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("MQ135: ");
+  lcd.print(mq135_ppm);
+  lcd.print(" PPM");
+
+  lcd.setCursor(0, 1);
+  lcd.print("MQ6: ");
+  lcd.print(mq6_ppm);
+  lcd.print(" PPM");
+
+  // Check air quality thresholds and trigger alarm if exceeded
+  if (!alarmSilenced && (mq135_ppm > MQ135_THRESHOLD || mq6_ppm > MQ6_THRESHOLD)) {
+    triggerAlarm();
+  } else {
+    // Silence alarm if button is pressed
+    if (digitalRead(BUTTON_PIN) == LOW) {
+      alarmSilenced = true;
+      digitalWrite(LED_PIN, LOW);
+      noTone(BUZZER_PIN);
+    }
+  }
+
+  // Control fan based on air quality
+  if (mq135_ppm > MQ135_THRESHOLD || mq6_ppm > MQ6_THRESHOLD) {
+    digitalWrite(FAN_PIN, HIGH); // Turn on fan to improve air quality
+  } else {
+    digitalWrite(FAN_PIN, LOW); // Turn off fan
+  }
+
+  // Log sensor data
+  logData(mq135_ppm, mq6_ppm);
+
+  // Delay for stability
+  delay(1000);
+}
+
+void triggerAlarm() {
+  // Example: Flash LED and sound buzzer
+  digitalWrite(LED_PIN, HIGH);
+  tone(BUZZER_PIN, 1000); // 1000 Hz sound
+  delay(1000); // Alarm duration
+  digitalWrite(LED_PIN, LOW);
+  noTone(BUZZER_PIN);
+}
+
+void logData(float mq135_ppm, float mq6_ppm) {
+  // Example: Log data to serial monitor
+  Serial.print("MQ135 PPM: ");
+  Serial.print(mq135_ppm);
+  Serial.print(" | MQ6 PPM: ");
+  Serial.println(mq6_ppm);
+}
+
+void calibrateSensors() {
+  // Perform sensor calibration here
+  // This function can be implemented based on the calibration requirements of the sensors
+}
